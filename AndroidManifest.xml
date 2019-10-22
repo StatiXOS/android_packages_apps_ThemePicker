@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.android.wallpaper">
+          package="com.android.customization">
 
     <uses-sdk android:targetSdkVersion="29" android:minSdkVersion="28"/>
 
@@ -27,7 +27,7 @@
             android:resizeableActivity="false"
             android:theme="@style/CustomizationTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.SET_WALLPAPER"/>
+                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
