@@ -85,9 +85,7 @@ class OverlayThemeExtractor {
             builder.addOverlayPackage(getOverlayCategory(shapeOverlayPackage),
                     shapeOverlayPackage)
                     .setShapePath(
-                            loadString(ResourceConstants.CONFIG_ICON_MASK, shapeOverlayPackage))
-                    .setBottomSheetCornerRadius(
-                            loadDimen(ResourceConstants.CONFIG_CORNERRADIUS, shapeOverlayPackage));
+                            loadString(ResourceConstants.CONFIG_ICON_MASK, shapeOverlayPackage));
         } else {
             addSystemDefaultShape(builder);
         }
@@ -134,9 +132,13 @@ class OverlayThemeExtractor {
 
     void addIconOverlay(Builder builder, String packageName, String... previewIcons)
             throws NameNotFoundException {
-        builder.addOverlayPackage(getOverlayCategory(packageName), packageName);
         for (String iconName : previewIcons) {
             builder.addIcon(loadIconPreviewDrawable(iconName, packageName, false));
+            try {
+                builder.addIcon(loadIconPreviewDrawable(iconName, packageName, false));
+            } catch (NameNotFoundException | NotFoundException e) {
+                Log.w(TAG, "Didn't find overlay icon " + iconName);
+            }
         }
     }
 
@@ -163,7 +165,7 @@ class OverlayThemeExtractor {
                 builder.addIcon(loadIconPreviewDrawable(iconName, packageName, true));
             }
         } catch (NameNotFoundException | NotFoundException e) {
-            Log.w(TAG, "Didn't find android package icons, will skip preview", e);
+            Log.d(TAG, "Didn't find android package icons, will skip preview");
         }
     }
 
@@ -172,11 +174,7 @@ class OverlayThemeExtractor {
         String iconMaskPath = system.getString(
                 system.getIdentifier(ResourceConstants.CONFIG_ICON_MASK,
                         "string", ResourceConstants.ANDROID_PACKAGE));
-        builder.setShapePath(iconMaskPath)
-                .setBottomSheetCornerRadius(
-                        system.getDimensionPixelOffset(
-                                system.getIdentifier(ResourceConstants.CONFIG_CORNERRADIUS,
-                                        "dimen", ResourceConstants.ANDROID_PACKAGE)));
+        builder.setShapePath(iconMaskPath);
     }
 
     void addSystemDefaultColor(Builder builder) {
