@@ -188,12 +188,12 @@ class OverlayThemeExtractor {
 
     void addSystemDefaultIcons(Builder builder, String packageName,
             String... previewIcons) {
-        try {
-            for (String iconName : previewIcons) {
+        for (String iconName : previewIcons) {
+            try {
                 builder.addIcon(loadIconPreviewDrawable(iconName, packageName, true));
+            } catch (NameNotFoundException | NotFoundException e) {
+                Log.d(TAG, "Didn't find android package icon " + iconName);
             }
-        } catch (NameNotFoundException | NotFoundException e) {
-            Log.d(TAG, "Didn't find android package icons, will skip preview");
         }
     }
 
