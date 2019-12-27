@@ -16,7 +16,7 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/preview_primary"
+    android:id="@+id/preview_styles"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"

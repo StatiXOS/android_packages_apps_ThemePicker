@@ -18,8 +18,10 @@ package com.android.customization.model.theme;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_PRIMARY;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_ANDROID;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_SETTINGS;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_SYSUI;
 import static com.android.customization.model.ResourceConstants.PATH_SIZE;
 
 import android.content.Context;
@@ -124,7 +126,7 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
             ((ImageView) view.findViewById(R.id.theme_option_icon)).setImageDrawable(
                     icon);
         }
-        view.setBackgroundColor(mPreviewInfo.colorPrimary);
+        view.setBackgroundColor(mPreviewInfo.resolveStyleBackgroundColor(res));
         view.setContentDescription(getContentDescription(view.getContext()));
     }
 
@@ -256,13 +258,13 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
                 CharSequence iconName = getOverlayName(pm, OVERLAY_CATEGORY_ICON_ANDROID);
                 CharSequence shapeName = getOverlayName(pm, OVERLAY_CATEGORY_SHAPE);
                 CharSequence colorName = getOverlayName(pm, OVERLAY_CATEGORY_COLOR);
-                CharSequence primaryName = getOverlayName(pm, OVERLAY_CATEGORY_PRIMARY);
+                CharSequence styleName = getOverlayName(pm, OVERLAY_CATEGORY_UISTYLE_ANDROID);
                 mContentDescription = context.getString(R.string.theme_description,
                         TextUtils.isEmpty(fontName) ? defaultName : fontName,
                         TextUtils.isEmpty(iconName) ? defaultName : iconName,
                         TextUtils.isEmpty(shapeName) ? defaultName : shapeName,
                         TextUtils.isEmpty(colorName) ? defaultName : colorName,
-                        TextUtils.isEmpty(primaryName) ? defaultName : primaryName);
+                        TextUtils.isEmpty(styleName) ? defaultName : styleName);
             }
         }
         return mContentDescription;
@@ -283,14 +285,16 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
         public final String fontName;
         @ColorInt public final int colorAccentLight;
         @ColorInt public final int colorAccentDark;
-        @ColorInt public final int colorPrimary;
+        /**@ColorInt public final int colorStyleBackground;**/
+        @ColorInt public final int colorStyleBackgroundLight;
+        @ColorInt public final int colorStyleBackgroundDark;
         public final List<Drawable> icons;
         public final Drawable shapeDrawable;
         @Nullable public final Asset wallpaperAsset;
         public final List<Drawable> shapeAppIcons;
 
         private PreviewInfo(Context context, Typeface bodyFontFamily, Typeface headlineFontFamily,
-             String fontName, int colorAccentLight, int colorAccentDark, int colorPrimary,
+             String fontName, int colorAccentLight, int colorAccentDark, int colorStyleBackgroundLight, int colorStyleBackgroundDark,
                 List<Drawable> icons, Drawable shapeDrawable,
                 @Nullable Asset wallpaperAsset, List<Drawable> shapeAppIcons) {
             this.bodyFontFamily = bodyFontFamily;
@@ -298,7 +302,8 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
             this.fontName = fontName;
             this.colorAccentLight = colorAccentLight;
             this.colorAccentDark = colorAccentDark;
-            this.colorPrimary = colorPrimary;
+            this.colorStyleBackgroundLight = colorStyleBackgroundLight;
+            this.colorStyleBackgroundDark = colorStyleBackgroundDark;
             this.icons = icons;
             this.shapeDrawable = shapeDrawable;
             this.wallpaperAsset = wallpaperAsset == null
@@ -318,8 +323,9 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
         }
 
         @ColorInt
-        public int resolvePrimaryColor(Resources res) {
-            return colorPrimary;
+        public int resolveStyleBackgroundColor(Resources res) {
+            return (res.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                    == Configuration.UI_MODE_NIGHT_YES ? colorStyleBackgroundDark : colorStyleBackgroundLight;
         }
     }
 
@@ -330,7 +336,9 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
         private String mFontName;
         @ColorInt private int mColorAccentLight = -1;
         @ColorInt private int mColorAccentDark = -1;
-        @ColorInt private int mColorPrimary = -1;
+        @ColorInt private int mColorStyleBackground = -1;
+        @ColorInt private int mColorStyleBackgroundLight = -1;
+        @ColorInt private int mColorStyleBackgroundDark = -1;
         private List<Drawable> mIcons = new ArrayList<>();
         private String mPathString;
         private Path mShapePath;
@@ -371,7 +379,7 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
                 }
             }
             return new PreviewInfo(context, mBodyFontFamily, mHeadlineFontFamily, mFontName, mColorAccentLight,
-                    mColorAccentDark, mColorPrimary, mIcons, shapeDrawable,
+                    mColorAccentDark, mColorStyleBackgroundLight, mColorStyleBackgroundDark, mIcons, shapeDrawable,
                     mWallpaperAsset, shapeIcons);
         }
 
@@ -408,13 +416,18 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
             return this;
         }
 
-        public Builder setColorPrimary(@ColorInt int colorPrimary) {
-            mColorPrimary = colorPrimary;
+        public Builder setBackgroundColorLight(@ColorInt int colorBackgroundLight) {
+            mColorStyleBackgroundLight = colorBackgroundLight;
             return this;
         }
 
         public Builder setColorAccentDark(@ColorInt int colorAccentDark) {
             mColorAccentDark = colorAccentDark;
+            return this;
+        }
+
+        public Builder setBackgroundColorDark(@ColorInt int colorBackgroundDark) {
+            mColorStyleBackgroundDark = colorBackgroundDark;
             return this;
         }
 
@@ -480,6 +493,12 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
         public int resolveAccentColor(Resources res) {
             return (res.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
                     == Configuration.UI_MODE_NIGHT_YES ? mColorAccentDark : mColorAccentLight;
+        }
+
+        @ColorInt
+        public int resolveBackgroundColor(Resources res) {
+            return (res.getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                    == Configuration.UI_MODE_NIGHT_YES ? mColorStyleBackgroundDark : mColorStyleBackgroundLight;
         }
     }
 }

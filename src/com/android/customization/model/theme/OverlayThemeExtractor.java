@@ -76,16 +76,24 @@ class OverlayThemeExtractor {
         }
     }
 
-    void addPrimaryOverlay(Builder builder, String primaryOverlayPackage)
+    void addUiStyleOverlay(Builder builder, String uiStyleOverlayPackage)
             throws NameNotFoundException {
-        
-        if (!TextUtils.isEmpty(primaryOverlayPackage)) {
-            builder.addOverlayPackage(getOverlayCategory(primaryOverlayPackage),
-                    primaryOverlayPackage)
-                    .setColorPrimary(loadColor(ResourceConstants.PRIMARY_COLOR_NAME,
-                            primaryOverlayPackage));
+        if (!TextUtils.isEmpty(uiStyleOverlayPackage)) {
+            builder.addOverlayPackage(getOverlayCategory(uiStyleOverlayPackage),
+                    uiStyleOverlayPackage)
+                    .setBackgroundColorLight(loadColor(ResourceConstants.STYLE_BACKGROUND_COLOR_LIGHT_NAME,
+                            uiStyleOverlayPackage))
+                    .setBackgroundColorDark(loadColor(ResourceConstants.STYLE_BACKGROUND_COLOR_DARK_NAME,
+                            uiStyleOverlayPackage));
         } else {
-            addSystemDefaultPrimary(builder);
+            addSystemDefaultStyle(builder);
+        }
+    }
+
+    void addNoPreviewUiStyleOverlay(Builder builder, String overlayPackage) {
+        if (!TextUtils.isEmpty(overlayPackage)) {
+            builder.addOverlayPackage(getOverlayCategory(overlayPackage),
+                    overlayPackage);
         }
     }
 
@@ -208,20 +216,17 @@ class OverlayThemeExtractor {
         builder.setColorAccentDark(colorAccentDark);
     }
 
-    void addSystemDefaultPrimary(Builder builder) {
-        @ColorInt int colorPrimary = getSystemDefaultPrimary();
-        builder.setColorPrimary(colorPrimary);
-    }
-
-    @ColorInt int getSystemDefaultPrimary() {
-        Configuration configuration = mContext.getResources().getConfiguration();
-        boolean nightMode = (configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK)
-                    == Configuration.UI_MODE_NIGHT_YES ? true : false;
+    void addSystemDefaultStyle(Builder builder) {
         Resources system = Resources.getSystem();
-        int colorPrimary = system.getColor(
-                system.getIdentifier(nightMode ? ResourceConstants.PRIMARY_COLOR_DEFAULT_DARK_NAME : ResourceConstants.PRIMARY_COLOR_DEFAULT_LIGHT_NAME, "color",
-                ResourceConstants.ANDROID_PACKAGE), null);
-        return colorPrimary;
+        int colorBackgroundLight = system.getColor(
+                system.getIdentifier(ResourceConstants.STYLE_BACKGROUND_COLOR_LIGHT_NAME, "color",
+                        ResourceConstants.ANDROID_PACKAGE), null);
+        builder.setBackgroundColorLight(colorBackgroundLight);
+
+        int colorBackgroundDark = system.getColor(
+                system.getIdentifier(ResourceConstants.STYLE_BACKGROUND_COLOR_DARK_NAME, "color",
+                        ResourceConstants.ANDROID_PACKAGE), null);
+        builder.setBackgroundColorDark(colorBackgroundDark);
     }
 
     void addSystemDefaultFont(Builder builder) {

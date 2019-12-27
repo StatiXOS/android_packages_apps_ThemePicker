@@ -26,7 +26,9 @@ import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_SETTINGS;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_SYSUI;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_THEMEPICKER;
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_PRIMARY;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_ANDROID;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_SETTINGS;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_SYSUI;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
 import static com.android.customization.model.ResourceConstants.SYSUI_PACKAGE;
 
@@ -78,12 +80,14 @@ public class DefaultThemeProvider extends ResourcesApkProvider implements ThemeB
     private static final String TITLE_PREFIX = "theme_title_";
     private static final String FONT_PREFIX = "theme_overlay_font_";
     private static final String COLOR_PREFIX = "theme_overlay_color_";
-    private static final String PRIMARY_PREFIX = "theme_overlay_primary_";
     private static final String SHAPE_PREFIX = "theme_overlay_shape_";
     private static final String ICON_ANDROID_PREFIX = "theme_overlay_icon_android_";
     private static final String ICON_LAUNCHER_PREFIX = "theme_overlay_icon_launcher_";
     private static final String ICON_SETTINGS_PREFIX = "theme_overlay_icon_settings_";
     private static final String ICON_SYSUI_PREFIX = "theme_overlay_icon_sysui_";
+    private static final String UISTYLE_ANDROID_PREFIX = "theme_overlay_style_android_";
+    private static final String UISTYLE_SETTINGS_PREFIX = "theme_overlay_style_settings_";
+    private static final String UISTYLE_SYSUI_PREFIX = "theme_overlay_style_sysui_";
     private static final String WALLPAPER_PREFIX = "theme_wallpaper_";
     private static final String WALLPAPER_TITLE_PREFIX = "theme_wallpaper_title_";
     private static final String WALLPAPER_ATTRIBUTION_PREFIX = "theme_wallpaper_attribution_";
@@ -154,12 +158,21 @@ public class DefaultThemeProvider extends ResourcesApkProvider implements ThemeB
             }
 
             try {
-                String primaryOverlayPackage = getOverlayPackage(PRIMARY_PREFIX, themeName);
-                mOverlayProvider.addPrimaryOverlay(builder, primaryOverlayPackage);
+                String uiStyleOverlayPackage = getOverlayPackage(UISTYLE_ANDROID_PREFIX,
+                    themeName);
+                mOverlayProvider.addUiStyleOverlay(builder, uiStyleOverlayPackage);
             } catch (NameNotFoundException | NotFoundException e) {
-                Log.d(TAG, "Didn't find primary overlay for theme, will use system default");
-                mOverlayProvider.addSystemDefaultPrimary(builder);
+                Log.d(TAG, "Didn't find android UI style overlay for theme, will use system default");
+                mOverlayProvider.addSystemDefaultStyle(builder);
             }
+
+            String styleSettingsOverlayPackage = getOverlayPackage(UISTYLE_SETTINGS_PREFIX,
+                    themeName);
+            mOverlayProvider.addNoPreviewUiStyleOverlay(builder, styleSettingsOverlayPackage);
+
+            String styleSysUiOverlayPackage = getOverlayPackage(UISTYLE_SYSUI_PREFIX,
+                    themeName);
+            mOverlayProvider.addNoPreviewUiStyleOverlay(builder, styleSysUiOverlayPackage);
 
             try {
                 String fontOverlayPackage = getOverlayPackage(FONT_PREFIX, themeName);
@@ -312,11 +325,11 @@ public class DefaultThemeProvider extends ResourcesApkProvider implements ThemeB
         }
 
         try {
-            String primaryOverlayPackage = getOverlayPackage(PRIMARY_PREFIX, DEFAULT_THEME_NAME);
-            mOverlayProvider.addPrimaryOverlay(builder, primaryOverlayPackage);
+            String uiStyleOverlayPackage = getOverlayPackage(UISTYLE_ANDROID_PREFIX, DEFAULT_THEME_NAME);
+            mOverlayProvider.addUiStyleOverlay(builder, uiStyleOverlayPackage);
         } catch (NameNotFoundException | NotFoundException e) {
-            Log.d(TAG, "Didn't find color overlay for default theme, will use system default");
-            mOverlayProvider.addSystemDefaultPrimary(builder);
+            Log.d(TAG, "Didn't find ui style overlay for default theme, will use system default");
+            mOverlayProvider.addSystemDefaultStyle(builder);
         }
 
         try {
@@ -482,8 +495,12 @@ public class DefaultThemeProvider extends ResourcesApkProvider implements ThemeB
                     customPackages.get(OVERLAY_CATEGORY_FONT));
             mOverlayProvider.addColorOverlay(builder,
                     customPackages.get(OVERLAY_CATEGORY_COLOR));
-            mOverlayProvider.addPrimaryOverlay(builder,
-                    customPackages.get(OVERLAY_CATEGORY_PRIMARY));
+            mOverlayProvider.addUiStyleOverlay(builder,
+                    customPackages.get(OVERLAY_CATEGORY_UISTYLE_ANDROID));
+            mOverlayProvider.addNoPreviewIconOverlay(builder,
+                    customPackages.get(OVERLAY_CATEGORY_UISTYLE_SYSUI));
+            mOverlayProvider.addNoPreviewIconOverlay(builder,
+                    customPackages.get(OVERLAY_CATEGORY_UISTYLE_SETTINGS));
             mOverlayProvider.addAndroidIconOverlay(builder,
                     customPackages.get(OVERLAY_CATEGORY_ICON_ANDROID));
             mOverlayProvider.addSysUiIconOverlay(builder,
