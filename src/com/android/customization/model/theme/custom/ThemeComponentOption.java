@@ -22,8 +22,10 @@ import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_SETTINGS;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_SYSUI;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_THEMEPICKER;
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_PRIMARY;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_ANDROID;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_SETTINGS;
+import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_UISTYLE_SYSUI;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -415,7 +417,7 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
         }
     }
 
-    public static class PrimaryOption extends ThemeComponentOption {
+    public static class UiStyleOption extends ThemeComponentOption {
 
         /**
          * Ids of views used to represent control buttons in the color preview screen
@@ -425,17 +427,11 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
                 R.id.preview_toggle_selected
         };
 
-        @ColorInt private int mPrimaryColor;
+        @ColorInt private int mBackgroundColorLight;
+        @ColorInt private int mBackgroundColorDark;
         @ColorInt private int mAccentColor;
 
         private String mLabel;
-
-        PrimaryOption(String packageName, String label, @ColorInt int primaryColor, @ColorInt int accentColor) {
-            addOverlayPackage(OVERLAY_CATEGORY_PRIMARY, packageName);
-            mLabel = label;
-            mPrimaryColor = primaryColor;
-            mAccentColor = accentColor;
-        }
 
         @Override
         public void bindThumbnailTile(View view) {
@@ -447,34 +443,56 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
 
         @ColorInt
         private int resolveColor(Resources res) {
-            return mPrimaryColor;
+            Configuration configuration = res.getConfiguration();
+            return (configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                    == Configuration.UI_MODE_NIGHT_YES ? mBackgroundColorDark : mBackgroundColorLight;
         }
 
         @Override
         public boolean isActive(CustomizationManager<ThemeComponentOption> manager) {
             CustomThemeManager customThemeManager = (CustomThemeManager) manager;
-            return Objects.equals(getOverlayPackages().get(OVERLAY_CATEGORY_PRIMARY),
-                    customThemeManager.getOverlayPackages().get(OVERLAY_CATEGORY_PRIMARY));
+            Map<String, String> themePackages = customThemeManager.getOverlayPackages();
+            if (getOverlayPackages().isEmpty()) {
+                return themePackages.get(OVERLAY_CATEGORY_UISTYLE_SETTINGS) == null &&
+                        themePackages.get(OVERLAY_CATEGORY_UISTYLE_SYSUI) == null &&
+                        themePackages.get(OVERLAY_CATEGORY_UISTYLE_ANDROID) == null;
+            }
+            for (Map.Entry<String, String> overlayEntry : getOverlayPackages().entrySet()) {
+                if(!Objects.equals(overlayEntry.getValue(),
+                        themePackages.get(overlayEntry.getKey()))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void addStyleInfo(String packageName, String label, @ColorInt int backgroundColorLight,@ColorInt int backgroundColorDark, @ColorInt int accentColor) {
+            mLabel = label;
+            mBackgroundColorLight = backgroundColorLight;
+            mBackgroundColorDark = backgroundColorDark;
+            mAccentColor = accentColor;
         }
 
         @Override
         public int getLayoutResId() {
-            return R.layout.theme_primary_option;
+            return R.layout.theme_style_option;
         }
 
         @Override
         public void bindPreview(ViewGroup container) {
-            bindPreviewHeader(container, R.string.preview_name_primary, R.drawable.ic_colorize_24px);
+            bindPreviewHeader(container, R.string.preview_name_ui_style, R.drawable.ic_colorize_24px);
 
+            TextView header = container.findViewById(R.id.theme_preview_card_header);
+            header.setText(container.getContext().getString(R.string.preview_name_ui_style) + "\n\u0028" + mLabel + "\u0029");
             ViewGroup cardBody = container.findViewById(R.id.theme_preview_card_body_container);
             if (cardBody.getChildCount() == 0) {
                 LayoutInflater.from(container.getContext()).inflate(
-                        R.layout.preview_card_primary_content, cardBody, true);
+                        R.layout.preview_card_style_content, cardBody, true);
             }
             Resources res = container.getResources();
-            @ColorInt int primaryColor = resolveColor(res);
-            View v = container.findViewById(R.id.preview_primary);
-            v.setBackgroundColor(primaryColor);
+            View v = container.findViewById(R.id.preview_styles);
+            @ColorInt int backgroundColor = resolveColor(res);
+            v.setBackgroundColor(backgroundColor);
 
             @ColorInt int controlGreyColor = res.getColor(R.color.control_grey);
             ColorStateList tintList = new ColorStateList(
@@ -508,9 +526,21 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
             seekbar.setOnTouchListener((view, motionEvent) -> true);
         }
 
+        /**
+         * @return whether this icon option has overlays and previews for all the required packages
+         */
+        public boolean isValid(Context context) {
+            return getOverlayPackages().keySet().size() ==
+                    ResourceConstants.getPackagesToOverlay(context).length;
+        }
+
+        public void setLabel(String label) {
+            mLabel = label;
+        }
+
         @Override
         public Builder buildStep(Builder builder) {
-            builder.setColorPrimary(mPrimaryColor);
+	          builder.setBackgroundColorLight(mBackgroundColorLight).setBackgroundColorDark(mBackgroundColorDark);
             return super.buildStep(builder);
         }
     }

@@ -66,7 +66,9 @@ public interface ResourceConstants {
     String OVERLAY_CATEGORY_ICON_SYSUI = "android.theme.customization.icon_pack.systemui";
     String OVERLAY_CATEGORY_ICON_LAUNCHER = "android.theme.customization.icon_pack.launcher";
     String OVERLAY_CATEGORY_ICON_THEMEPICKER = "android.theme.customization.icon_pack.themepicker";
-    String OVERLAY_CATEGORY_PRIMARY = "android.theme.customization.primary_color";
+    String OVERLAY_CATEGORY_UISTYLE_ANDROID = "android.theme.customization.style.android";
+    String OVERLAY_CATEGORY_UISTYLE_SETTINGS = "android.theme.customization.style.settings";
+    String OVERLAY_CATEGORY_UISTYLE_SYSUI = "android.theme.customization.style.systemui";
 
     /**
      * Global Android theme category (default theme prebundled with the OS)
@@ -92,9 +94,12 @@ public interface ResourceConstants {
     ArrayList<String> sTargetPackages = new ArrayList<>();
     String ACCENT_COLOR_LIGHT_NAME = "accent_device_default_light";
     String ACCENT_COLOR_DARK_NAME = "accent_device_default_dark";
-    String PRIMARY_COLOR_NAME = "primary_device_default";
-    String PRIMARY_COLOR_DEFAULT_LIGHT_NAME = "primary_device_default_settings_light";
-    String PRIMARY_COLOR_DEFAULT_DARK_NAME = "primary_device_default_settings";
+
+    String STYLE_PRIMARY_COLOR_LIGHT_BACKGROUND = "primary_material_light";
+    String STYLE_PRIMARY_COLOR_DARK_BACKGROUND = "primary_material_dark";
+    String STYLE_BACKGROUND_COLOR_LIGHT_NAME = "background_material_light";
+    String STYLE_BACKGROUND_COLOR_DARK_NAME = "background_material_dark";
+    String STYLE_UI_ROUNDNESS_NAME = "config_dialogCornerRadius";
 
     float PATH_SIZE = 100f;
 

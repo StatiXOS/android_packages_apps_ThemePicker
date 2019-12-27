@@ -44,12 +44,12 @@ abstract class ThemePreviewPage extends PreviewPage {
     @ColorInt
     final int accentColor;
     @ColorInt
-    final int primaryColor;
+    final int backgroundColor;
     protected final LayoutInflater inflater;
 
     public ThemePreviewPage(Context context, @StringRes int titleResId,
             @DrawableRes int iconSrc, @LayoutRes int contentLayoutRes,
-            @ColorInt int accentColor,@ColorInt int primaryColor) {
+            @ColorInt int accentColor,@ColorInt int backgroundColor) {
         super(null);
         this.nameResId = titleResId;
         if (iconSrc != Resources.ID_NULL) {
@@ -61,7 +61,7 @@ abstract class ThemePreviewPage extends PreviewPage {
         }
         this.contentLayoutRes = contentLayoutRes;
         this.accentColor = accentColor;
-        this.primaryColor = primaryColor;
+        this.backgroundColor = backgroundColor;
         this.inflater = LayoutInflater.from(context);
     }
 
@@ -108,7 +108,7 @@ abstract class ThemePreviewPage extends PreviewPage {
         private final OnLayoutChangeListener[] mListeners;
         private final ColorStateList mTintList;
 
-        public ThemeCoverPage(Context context, String title, int accentColor, int primaryColor,
+        public ThemeCoverPage(Context context, String title, int accentColor, int backgroundColor,
                 List<Drawable> icons,
                 Typeface headlineFont,
                 Drawable shapeDrawable,
@@ -116,7 +116,7 @@ abstract class ThemePreviewPage extends PreviewPage {
                 OnClickListener editClickListener,
                 int[] colorButtonIds, int[] colorTileIds, int[][] colorTileIconIds,
                 int[] shapeIconIds, OnLayoutChangeListener... wallpaperListeners) {
-            super(context, 0, 0, R.layout.preview_card_cover_content, accentColor, primaryColor);
+            super(context, 0, 0, R.layout.preview_card_cover_content, accentColor, backgroundColor);
             mRes = context.getResources();
             mTitle = title;
             mHeadlineFont = headlineFont;
