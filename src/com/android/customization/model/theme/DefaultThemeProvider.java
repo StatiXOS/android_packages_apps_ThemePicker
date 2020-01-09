@@ -19,7 +19,6 @@ import static android.content.res.Resources.ID_NULL;
 
 import static com.android.customization.model.ResourceConstants.ANDROID_PACKAGE;
 import static com.android.customization.model.ResourceConstants.ICONS_FOR_PREVIEW;
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_LAUNCHER;
@@ -75,8 +74,8 @@ public class DefaultThemeProvider extends ResourcesApkProvider implements ThemeB
 
     private static final String THEMES_ARRAY = "themes";
     private static final String TITLE_PREFIX = "theme_title_";
-    private static final String FONT_PREFIX = "theme_overlay_font_";
     private static final String COLOR_PREFIX = "theme_overlay_color_";
+    private static final String FONT_PREFIX = "theme_overlay_font_";
     private static final String SHAPE_PREFIX = "theme_overlay_shape_";
     private static final String ICON_ANDROID_PREFIX = "theme_overlay_icon_android_";
     private static final String ICON_LAUNCHER_PREFIX = "theme_overlay_icon_launcher_";
@@ -141,14 +140,6 @@ public class DefaultThemeProvider extends ResourcesApkProvider implements ThemeB
             } catch (NotFoundException e) {
                 Log.d(TAG, "Didn't find title for theme, will use default");
                 builder.setTitle("unknown");
-            }
-
-            try {
-                String colorOverlayPackage = getOverlayPackage(COLOR_PREFIX, themeName);
-                mOverlayProvider.addColorOverlay(builder, colorOverlayPackage);
-            } catch (NameNotFoundException | NotFoundException e) {
-                Log.d(TAG, "Didn't find color overlay for theme, will use system default");
-                mOverlayProvider.addSystemDefaultColor(builder);
             }
 
             try {

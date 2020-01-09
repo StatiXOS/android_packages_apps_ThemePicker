@@ -20,7 +20,6 @@ import static com.android.customization.model.ResourceConstants.ACCENT_COLOR_LIG
 import static com.android.customization.model.ResourceConstants.ANDROID_PACKAGE;
 import static com.android.customization.model.ResourceConstants.ICONS_FOR_PREVIEW;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ANDROID_THEME;
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
 import static com.android.customization.model.ResourceConstants.PATH_SIZE;
@@ -30,8 +29,10 @@ import static com.android.customization.model.theme.custom.ThemeComponentOption.
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AccentUtils;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
@@ -40,6 +41,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.core.graphics.PathParser;
+import androidx.preference.Preference;
 
 import com.android.customization.model.ResourceConstants;
 import com.android.customization.model.theme.OverlayManagerCompat;
@@ -49,19 +51,25 @@ import com.android.wallpaper.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.statix.support.preferences.CustomSeekBarPreference;
+
 /**
  * Implementation of {@link ThemeComponentOptionProvider} that reads {@link ColorOption}s from
  * icon overlays.
  */
-public class ColorOptionsProvider extends ThemeComponentOptionProvider<ColorOption> {
+public class ColorOptionsProvider extends ThemeComponentOptionProvider<ColorOption> implements Preference.onPreferenceChangeListener {
 
     private static final String TAG = "ColorOptionsProvider";
     private final CustomThemeManager mCustomThemeManager;
     private final String mDefaultThemePackage;
+    private CustomSeekBarPreference mHue;
+    private CustomSeekBarPreference mSaturation;
+    private CustomSeekBarPreference mValue;
+    private List<Drawable> mPreviewIcons;
 
     public ColorOptionsProvider(Context context, OverlayManagerCompat manager,
             CustomThemeManager customThemeManager) {
-        super(context, manager, OVERLAY_CATEGORY_COLOR);
+        super(context, manager, "");
         mCustomThemeManager = customThemeManager;
         // System color is set with a static overlay for android.theme category, so let's try to
         // find that first, and if that's not present, we'll default to System resources.
@@ -73,7 +81,7 @@ public class ColorOptionsProvider extends ThemeComponentOptionProvider<ColorOpti
 
     @Override
     protected void loadOptions() {
-        List<Drawable> previewIcons = new ArrayList<>();
+        mPreviewIcons = new ArrayList<>();
         String iconPackage =
                 mCustomThemeManager.getOverlayPackages().get(OVERLAY_CATEGORY_ICON_ANDROID);
         if (TextUtils.isEmpty(iconPackage)) {
@@ -81,73 +89,52 @@ public class ColorOptionsProvider extends ThemeComponentOptionProvider<ColorOpti
         }
         for (String iconName : ICONS_FOR_PREVIEW) {
             try {
-                previewIcons.add(loadIconPreviewDrawable(iconName, iconPackage));
+                mPreviewIcons.add(loadIconPreviewDrawable(iconName, iconPackage));
             } catch (NameNotFoundException | NotFoundException e) {
                 Log.w(TAG, String.format("Couldn't load icon in %s for color preview, will skip it",
                         iconPackage), e);
             }
         }
-        String shapePackage = mCustomThemeManager.getOverlayPackages().get(OVERLAY_CATEGORY_SHAPE);
-        if (TextUtils.isEmpty(shapePackage)) {
-            shapePackage = ANDROID_PACKAGE;
-        }
-        Drawable shape = loadShape(shapePackage);
-        addDefault(previewIcons, shape);
-        for (String overlayPackage : mOverlayPackages) {
-            try {
-                Resources overlayRes = getOverlayResources(overlayPackage);
-                int lightColor = overlayRes.getColor(
-                        overlayRes.getIdentifier(ACCENT_COLOR_LIGHT_NAME, "color", overlayPackage),
-                        null);
-                int darkColor = overlayRes.getColor(
-                        overlayRes.getIdentifier(ACCENT_COLOR_DARK_NAME, "color", overlayPackage),
-                        null);
-                PackageManager pm = mContext.getPackageManager();
-                String label = pm.getApplicationInfo(overlayPackage, 0).loadLabel(pm).toString();
-                ColorOption option = new ColorOption(overlayPackage, label, lightColor, darkColor);
-                option.setPreviewIcons(previewIcons);
-                option.setShapeDrawable(shape);
-                mOptions.add(option);
-            } catch (NameNotFoundException | NotFoundException e) {
-                Log.w(TAG, String.format("Couldn't load color overlay %s, will skip it",
-                        overlayPackage), e);
-            }
-        }
+        // create 3 HSV sliders
+        mHue = new CustomSeekBarPreference(mContext);
+        mSaturation = new CustomSeekBarPreference(mContext);
+        mValue = new CustomSeekBarPreference(mContext);
+        // set slider mValues
+        setSliders(mPreviewIcons);
     }
 
-    private void addDefault(List<Drawable> previewIcons, Drawable shape) {
-        int lightColor, darkColor;
+    private float[] getSliders() {
+        float[] ret = new float[3];
+        ret[0] = mHue.getProgress();
+        ret[1] = mSaturation.getProgress()/100;
+        ret[2] = mValue.getProgress()/100;
+        return ret;
+    }
+    private void setSliders(List<Drawable> previewIcons) {
+        mHue.setMin(0);
+        mSaturation.setMin(0);
+        mValue.setMin(0);
+        mHue.setMax(360);
+        mSaturation.setMax(100);
+        mValue.setMax(100);
+        int lightColor;
         Resources system = Resources.getSystem();
         try {
             Resources r = getOverlayResources(mDefaultThemePackage);
             lightColor = r.getColor(
                     r.getIdentifier(ACCENT_COLOR_LIGHT_NAME, "color", mDefaultThemePackage),
                     null);
-            darkColor = r.getColor(
-                    r.getIdentifier(ACCENT_COLOR_DARK_NAME, "color", mDefaultThemePackage),
-                    null);
         } catch (NotFoundException | NameNotFoundException e) {
             Log.d(TAG, "Didn't find default color, will use system option", e);
-
             lightColor = system.getColor(
                     system.getIdentifier(ACCENT_COLOR_LIGHT_NAME, "color", ANDROID_PACKAGE), null);
-
-            darkColor = system.getColor(
-                    system.getIdentifier(ACCENT_COLOR_DARK_NAME, "color", ANDROID_PACKAGE), null);
         }
-        ColorOption option = new ColorOption(null,
-                mContext.getString(R.string.default_theme_title), lightColor, darkColor);
-        option.setPreviewIcons(previewIcons);
-        option.setShapeDrawable(shape);
-        mOptions.add(option);
-    }
-
-    private Drawable loadIconPreviewDrawable(String drawableName, String packageName)
-            throws NameNotFoundException, NotFoundException {
-
-        Resources overlayRes = getOverlayResources(packageName);
-        return overlayRes.getDrawable(
-                overlayRes.getIdentifier(drawableName, "drawable", packageName), null);
+        int useLightColor = AccentUtils.getLightAccentColor(lightColor);
+        float[] outputs = new float[3];
+        Color.colorToHSV(useLightColor, outputs);
+        mHue.setValue((int) outputs[0]);
+        mSaturation.setValue((int) outputs[1]);
+        mValue.setValue((int) outputs[2]);
     }
 
     private Drawable loadShape(String packageName) {
@@ -170,4 +157,43 @@ public class ColorOptionsProvider extends ThemeComponentOptionProvider<ColorOpti
         return shapeDrawable;
     }
 
+    private Drawable loadIconPreviewDrawable(String drawableName, String packageName)
+            throws NameNotFoundException, NotFoundException {
+
+        Resources overlayRes = getOverlayResources(packageName);
+        return overlayRes.getDrawable(
+                overlayRes.getIdentifier(drawableName, "drawable", packageName), null);
+    }
+
+    public boolean onPreferenceChange(Preference preference, Object objValue) {
+        float[] customLight = getSliders();
+        float[] customDark = getSliders();
+        if (preference == mHue) {
+            int newHue = (Integer) objValue;
+            customLight[0] = newHue;
+            customDark[0] = newHue;
+        } else if (preference == mSaturation) {
+            int newSat = (Integer) objValue;
+            customLight[1] = newSat;
+            customDark[1] = (float) Math.abs(newSat - customDark[1] - 0.12);
+        } else if (preference == mValue) {
+            int newVal = (Integer) objValue;
+            customLight[2] = newVal;
+            customDark[2] = newVal;
+        } else {
+            return false;
+        }
+        int lightColor = Color.HSVToColor(customLight);
+        int darkColor = Color.HSVToColor(customDark);
+        // add sliders to screen
+        ColorOption option = new ColorOption("Custom" /* Label */, lightColor, darkColor);
+        String shapePackage = mCustomThemeManager.getOverlayPackages().get(OVERLAY_CATEGORY_SHAPE);
+        if (TextUtils.isEmpty(shapePackage)) {
+            shapePackage = ANDROID_PACKAGE;
+        }
+        Drawable shape = loadShape(shapePackage);
+        option.setPreviewIcons(mPreviewIcons);
+        option.setShapeDrawable(shape);
+        return true;
+    }
 }

@@ -29,7 +29,6 @@ import com.android.wallpaper.module.NoOpUserEventLogger;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
 
@@ -89,7 +88,7 @@ public class StatsLogUserEventLogger extends NoOpUserEventLogger implements Them
     @Override
     public void logThemeSelected(ThemeBundle theme, boolean isCustomTheme) {
         WallpaperStatsLog.write(CODE, StyleEnums.PICKER_SELECT,
-                Objects.hashCode(getThemePackage(theme, OVERLAY_CATEGORY_COLOR)),
+                0,
                 Objects.hashCode(getThemePackage(theme,OVERLAY_CATEGORY_FONT)),
                 Objects.hashCode(getThemePackage(theme, OVERLAY_CATEGORY_SHAPE)),
                 0, 0, 0, 0, 0, 0);
@@ -98,7 +97,7 @@ public class StatsLogUserEventLogger extends NoOpUserEventLogger implements Them
     @Override
     public void logThemeApplied(ThemeBundle theme, boolean isCustomTheme) {
         WallpaperStatsLog.write(CODE, StyleEnums.PICKER_APPLIED,
-                Objects.hashCode(getThemePackage(theme, OVERLAY_CATEGORY_COLOR)),
+                0,
                 Objects.hashCode(getThemePackage(theme,OVERLAY_CATEGORY_FONT)),
                 Objects.hashCode(getThemePackage(theme, OVERLAY_CATEGORY_SHAPE)),
                 0, 0, 0, 0, 0, 0);

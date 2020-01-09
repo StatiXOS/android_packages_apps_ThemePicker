@@ -15,7 +15,6 @@
  */
 package com.android.customization.model.theme;
 
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
@@ -253,12 +252,10 @@ public class ThemeBundle implements CustomizationOption<ThemeBundle> {
                 CharSequence fontName = getOverlayName(pm, OVERLAY_CATEGORY_FONT);
                 CharSequence iconName = getOverlayName(pm, OVERLAY_CATEGORY_ICON_ANDROID);
                 CharSequence shapeName = getOverlayName(pm, OVERLAY_CATEGORY_SHAPE);
-                CharSequence colorName = getOverlayName(pm, OVERLAY_CATEGORY_COLOR);
                 mContentDescription = context.getString(R.string.theme_description,
                         TextUtils.isEmpty(fontName) ? defaultName : fontName,
                         TextUtils.isEmpty(iconName) ? defaultName : iconName,
-                        TextUtils.isEmpty(shapeName) ? defaultName : shapeName,
-                        TextUtils.isEmpty(colorName) ? defaultName : colorName);
+                        TextUtils.isEmpty(shapeName) ? defaultName : shapeName);
             }
         }
         return mContentDescription;
