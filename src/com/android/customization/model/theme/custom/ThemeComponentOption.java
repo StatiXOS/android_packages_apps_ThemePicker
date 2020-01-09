@@ -15,7 +15,6 @@
  */
 package com.android.customization.model.theme.custom;
 
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_LAUNCHER;
@@ -25,6 +24,7 @@ import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_SHAPE;
 
 import android.content.Context;
+import android.content.om.IOverlayManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -35,6 +35,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.os.UserHandle;
+import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.os.SystemProperties;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,6 +80,8 @@ import java.util.Objects;
 public abstract class ThemeComponentOption implements CustomizationOption<ThemeComponentOption> {
 
     protected final Map<String, String> mOverlayPackageNames = new HashMap<>();
+
+    protected static final String TAG = "ThemeComponentOption";
 
     protected void addOverlayPackage(String category, String packageName) {
         mOverlayPackageNames.put(category, packageName);
@@ -267,6 +274,10 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
 
     public static class ColorOption extends ThemeComponentOption {
 
+        private static final String ACCENT_DARK_PROP = "persist.sys.theme.accent_dark";
+        private static final String ACCENT_LIGHT_PROP = "persist.sys.theme.accent_light";
+        private static IOverlayManager mOverlayService;
+
         /**
          * Ids of views used to represent quick setting tiles in the color preview screen
          */
@@ -294,6 +305,8 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
 
         @ColorInt private int mColorAccentLight;
         @ColorInt private int mColorAccentDark;
+        private String darkAccent;
+        private String lightAccent;
         /**
          * Icons shown as example of QuickSettings tiles in the color preview screen.
          */
@@ -307,12 +320,13 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
 
         private String mLabel;
 
-        ColorOption(String packageName, String label, @ColorInt int lightColor,
+        ColorOption(String label, @ColorInt int lightColor,
                 @ColorInt int darkColor) {
-            addOverlayPackage(OVERLAY_CATEGORY_COLOR, packageName);
             mLabel = label;
             mColorAccentLight = lightColor;
             mColorAccentDark = darkColor;
+            darkAccent = String.format("%08X", (0xFFFFFFFF & darkColor));
+            lightAccent = String.format("%08X", (0xFFFFFFFF & lightColor));
         }
 
         @Override
@@ -332,9 +346,7 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
 
         @Override
         public boolean isActive(CustomizationManager<ThemeComponentOption> manager) {
-            CustomThemeManager customThemeManager = (CustomThemeManager) manager;
-            return Objects.equals(getOverlayPackages().get(OVERLAY_CATEGORY_COLOR),
-                    customThemeManager.getOverlayPackages().get(OVERLAY_CATEGORY_COLOR));
+            return true; // this appears to be useless after this
         }
 
         @Override
@@ -410,6 +422,18 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
         @Override
         public Builder buildStep(Builder builder) {
             builder.setColorAccentDark(mColorAccentDark).setColorAccentLight(mColorAccentLight);
+            SystemProperties.set(ACCENT_LIGHT_PROP, lightAccent);
+            SystemProperties.set(ACCENT_DARK_PROP, darkAccent);
+            mOverlayService = ServiceManager.getService(Context.OVERLAY_SERVICE) != null ? IOverlayManager.Stub
+                .asInterface(ServiceManager.getService(Context.OVERLAY_SERVICE))
+                : null;
+            try {
+                mOverlayService.reloadAndroidAssets(UserHandle.USER_CURRENT);
+                mOverlayService.reloadAssets("com.android.settings", UserHandle.USER_CURRENT);
+                mOverlayService.reloadAssets("com.android.systemui", UserHandle.USER_CURRENT);
+            } catch (RemoteException ree) {
+                Log.e(TAG, "Failed to reload assets.");
+            }
             return super.buildStep(builder);
         }
     }

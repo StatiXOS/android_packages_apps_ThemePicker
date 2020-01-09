@@ -15,7 +15,6 @@
  */
 package com.android.customization.model.theme;
 
-import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_COLOR;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_FONT;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_ANDROID;
 import static com.android.customization.model.ResourceConstants.OVERLAY_CATEGORY_ICON_LAUNCHER;
@@ -51,7 +50,6 @@ public class ThemeManager implements CustomizationManager<ThemeBundle> {
 
     private static final Set<String> THEME_CATEGORIES = new HashSet<>();
     static {
-        THEME_CATEGORIES.add(OVERLAY_CATEGORY_COLOR);
         THEME_CATEGORIES.add(OVERLAY_CATEGORY_FONT);
         THEME_CATEGORIES.add(OVERLAY_CATEGORY_SHAPE);
         THEME_CATEGORIES.add(OVERLAY_CATEGORY_ICON_ANDROID);
