@@ -190,4 +190,9 @@
 
     <!-- Generic error message [CHAR_LIMIT=NONE] -->
     <string name="something_went_wrong">Oops! Something went wrong.</string>
+
+    <!-- Seekbar titles -->
+    <string name="hue_title">Hue</string>
+    <string name="saturation_title">Saturation</string>
+    <string name="value_title">Value</string>
 </resources>
