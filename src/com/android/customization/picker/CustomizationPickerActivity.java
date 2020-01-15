@@ -55,6 +55,8 @@ import com.android.customization.picker.grid.GridFragment;
 import com.android.customization.picker.grid.GridFragment.GridFragmentHost;
 import com.android.customization.picker.theme.ThemeFragment;
 import com.android.customization.picker.theme.ThemeFragment.ThemeFragmentHost;
+import com.android.customization.picker.iconpack.IconPackFragment;
+import com.android.customization.picker.iconpack.IconPackFragment.IconPackFragmentHost;
 import com.android.customization.widget.NoTintDrawableWrapper;
 import com.android.wallpaper.R;
 import com.android.wallpaper.compat.BuildCompat;
@@ -83,7 +85,7 @@ import java.util.Map;
  *  Fragments providing customization options.
  */
 public class CustomizationPickerActivity extends FragmentActivity implements WallpapersUiContainer,
-        CategoryFragmentHost, ThemeFragmentHost, GridFragmentHost, ClockFragmentHost {
+        CategoryFragmentHost, ThemeFragmentHost, GridFragmentHost, ClockFragmentHost, IconPackFragmentHost {
 
     private static final String TAG = "CustomizationPickerActivity";
     private static final String WALLPAPER_FLAVOR_EXTRA = "com.android.launcher3.WALLPAPER_FLAVOR";
@@ -223,6 +225,13 @@ public class CustomizationPickerActivity extends FragmentActivity implements Wal
             mSections.put(R.id.nav_grid, new GridSection(R.id.nav_grid, gridManager));
         } else {
             Log.d(TAG, "GridOptionsManager not available, removing Grid section");
+        }
+        // icon pack
+        IconPackManager ipMan = new IconPackManager(this, getContext());
+        if (ipMan.isAvailable()) {
+            mSections.put(R.id.nav_icon_pack, new IconPackSection(R.id.nav_icon_pack, ipMan));
+        } else {
+            Log.d(TAG, "IconPackManager not available, removing Icon Pack section");
         }
         mSections.put(R.id.nav_wallpaper, new WallpaperSection(R.id.nav_wallpaper));
     }
@@ -512,6 +521,22 @@ public class CustomizationPickerActivity extends FragmentActivity implements Wal
         Fragment getFragment() {
             if (mFragment == null) {
                 mFragment = ClockFragment.newInstance(getString(R.string.clock_title));
+            }
+            return mFragment;
+        }
+    }
+
+    private class IconPackSection extends CustomizationSection<IconPack> {
+        private IconPackFragment mFragment;
+
+        private IconPackSection(int id, IconPackManager manager) {
+            super(id, manager);
+        }
+
+        @Override
+        Fragment getFragment() {
+            if (mFragment == null) {
+                mFragment = IconPackFragment.newInstance(getString(R.string.icon_pack_title));
             }
             return mFragment;
         }

@@ -34,6 +34,10 @@
         [CHAR LIMIT=19] -->
     <string name="wallpaper_title">Wallpaper</string>
 
+    <!-- Title of a second of the customization picker where the user can select a icon pack for
+        the system. [CHAR LIMIT=15] -->
+    <string name="icon_pack_title">Icon Pack</string>
+
     <!-- Label for a button that allows the user to apply the currently selected Theme.
         [CHAR LIMIT=20] -->
     <string name="apply_theme_btn">Apply</string>
