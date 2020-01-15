@@ -224,6 +224,13 @@ public class CustomizationPickerActivity extends FragmentActivity implements Wal
         } else {
             Log.d(TAG, "GridOptionsManager not available, removing Grid section");
         }
+        // icon pack
+        IconPackManager ipMan = new IconPackManager(this, getContext());
+        if (ipMan.isAvailable()) {
+            mSections.put(R.id.nav_icon_pack, new IconPackSection(R.id.nav_icon_pack, ipMan));
+        } else {
+            Log.d(TAG, "IconPackManager not available, removing Icon Pack section");
+        }
         mSections.put(R.id.nav_wallpaper, new WallpaperSection(R.id.nav_wallpaper));
     }
 
@@ -512,6 +519,22 @@ public class CustomizationPickerActivity extends FragmentActivity implements Wal
         Fragment getFragment() {
             if (mFragment == null) {
                 mFragment = ClockFragment.newInstance(getString(R.string.clock_title));
+            }
+            return mFragment;
+        }
+    }
+
+    private class IconPackSection extends CustomizationSection<IconPack> {
+        private IconPackFragment mFragment;
+
+        private IconPackSection(int id, IconPackManager manager) {
+            super(id, manager);
+        }
+
+        @Override
+        Fragment getFragment() {
+            if (mFragment == null) {
+                mFragment = IconPackFragment.newInstance(getString(R.string.icon_pack_title));
             }
             return mFragment;
         }
