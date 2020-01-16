@@ -78,12 +78,22 @@ class OverlayThemeExtractor {
 
     void addPrimaryOverlay(Builder builder, String primaryOverlayPackage)
             throws NameNotFoundException {
-        
+
         if (!TextUtils.isEmpty(primaryOverlayPackage)) {
             builder.addOverlayPackage(getOverlayCategory(primaryOverlayPackage),
-                    primaryOverlayPackage)
-                    .setColorPrimary(loadColor(ResourceConstants.PRIMARY_COLOR_NAME,
-                            primaryOverlayPackage));
+                    primaryOverlayPackage);
+
+            Configuration configuration = mContext.getResources().getConfiguration();
+            boolean nightMode = (configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK)
+                    == Configuration.UI_MODE_NIGHT_YES;
+
+            if(nightMode) {
+                builder.setColorPrimary(loadPrimaryColorDark(primaryOverlayPackage));
+                builder.setColorSecondaryPrimary(loadPrimaryColorLight(primaryOverlayPackage));
+            } else {
+                builder.setColorPrimary(loadPrimaryColorLight(primaryOverlayPackage));
+                builder.setColorSecondaryPrimary(loadPrimaryColorDark(primaryOverlayPackage));
+            }
         } else {
             addSystemDefaultPrimary(builder);
         }
@@ -209,19 +219,24 @@ class OverlayThemeExtractor {
     }
 
     void addSystemDefaultPrimary(Builder builder) {
-        @ColorInt int colorPrimary = getSystemDefaultPrimary();
-        builder.setColorPrimary(colorPrimary);
-    }
-
-    @ColorInt int getSystemDefaultPrimary() {
         Configuration configuration = mContext.getResources().getConfiguration();
         boolean nightMode = (configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK)
-                    == Configuration.UI_MODE_NIGHT_YES ? true : false;
+                    == Configuration.UI_MODE_NIGHT_YES;
+
         Resources system = Resources.getSystem();
-        int colorPrimary = system.getColor(
-                system.getIdentifier(nightMode ? ResourceConstants.PRIMARY_COLOR_DEFAULT_DARK_NAME : ResourceConstants.PRIMARY_COLOR_DEFAULT_LIGHT_NAME, "color",
+        int defaultPrimaryColorLight = system.getColor(
+                system.getIdentifier(ResourceConstants.PRIMARY_COLOR_DEFAULT_LIGHT_NAME, "color",
                 ResourceConstants.ANDROID_PACKAGE), null);
-        return colorPrimary;
+        int defaultPrimaryColorDark = system.getColor(
+                system.getIdentifier(ResourceConstants.PRIMARY_COLOR_DEFAULT_DARK_NAME, "color",
+                ResourceConstants.ANDROID_PACKAGE), null);
+        if(nightMode) {
+            builder.setColorPrimary(defaultPrimaryColorDark);
+            builder.setColorSecondaryPrimary(defaultPrimaryColorLight);
+        } else {
+            builder.setColorPrimary(defaultPrimaryColorLight);
+            builder.setColorSecondaryPrimary(defaultPrimaryColorDark);
+        }
     }
 
     void addSystemDefaultFont(Builder builder) {
@@ -257,6 +272,58 @@ class OverlayThemeExtractor {
                 .getResourcesForApplication(colorPackage);
         return overlayRes.getColor(overlayRes.getIdentifier(colorName, "color", colorPackage),
                 null);
+    }
+
+    int loadPrimaryColorLight(String overlayPackage)
+            throws NameNotFoundException, NotFoundException {
+
+        Resources system = Resources.getSystem();
+        int defaultPrimaryColorLight = system.getColor(
+                system.getIdentifier(ResourceConstants.PRIMARY_COLOR_DEFAULT_LIGHT_NAME, "color",
+                ResourceConstants.ANDROID_PACKAGE), null);
+
+        Resources overlayResLight = mContext.getPackageManager()
+                .getResourcesForApplication(overlayPackage);
+
+        Configuration lightConf = overlayResLight.getConfiguration();
+        lightConf.uiMode &= ~Configuration.UI_MODE_NIGHT_MASK;
+        lightConf.uiMode |= Configuration.UI_MODE_NIGHT_NO;
+        overlayResLight.updateConfiguration(lightConf,
+                overlayResLight.getDisplayMetrics());
+
+        int primaryColorLightIdentifier = overlayResLight.getIdentifier(
+                ResourceConstants.PRIMARY_COLOR_DEFAULT_LIGHT_NAME,
+                "color", overlayPackage);
+
+        return primaryColorLightIdentifier != 0
+                ? overlayResLight.getColor(primaryColorLightIdentifier, null)
+                : defaultPrimaryColorLight;
+    }
+
+    int loadPrimaryColorDark(String overlayPackage)
+            throws NameNotFoundException, NotFoundException {
+
+        Resources system = Resources.getSystem();
+        int defaultPrimaryColorDark = system.getColor(
+                system.getIdentifier(ResourceConstants.PRIMARY_COLOR_DEFAULT_DARK_NAME, "color",
+                ResourceConstants.ANDROID_PACKAGE), null);
+
+        Resources overlayResDark = mContext.getPackageManager()
+                .getResourcesForApplication(overlayPackage);
+
+        Configuration darkConf = overlayResDark.getConfiguration();
+        darkConf.uiMode &= ~Configuration.UI_MODE_NIGHT_MASK;
+        darkConf.uiMode |= Configuration.UI_MODE_NIGHT_NO;
+        overlayResDark.updateConfiguration(darkConf,
+                overlayResDark.getDisplayMetrics());
+
+        int primaryColorDarkIdentifier = overlayResDark.getIdentifier(
+                ResourceConstants.PRIMARY_COLOR_DEFAULT_LIGHT_NAME,
+                "color", overlayPackage);
+
+        return primaryColorDarkIdentifier != 0
+                ? overlayResDark.getColor(primaryColorDarkIdentifier, null)
+                : defaultPrimaryColorDark;
     }
 
     String loadString(String stringName, String packageName)
