@@ -31,11 +31,15 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.util.StateSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -429,28 +433,61 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
         };
 
         @ColorInt private int mPrimaryColor;
+        @ColorInt private int mSecondaryPrimaryColor;
         @ColorInt private int mAccentColor;
 
         private String mLabel;
 
-        PrimaryOption(String packageName, String label, @ColorInt int primaryColor, @ColorInt int accentColor) {
+        PrimaryOption(String packageName, String label, @ColorInt int primaryColor,
+                @ColorInt int secondaryPrimaryColor, @ColorInt int accentColor) {
             addOverlayPackage(OVERLAY_CATEGORY_PRIMARY, packageName);
             mLabel = label;
             mPrimaryColor = primaryColor;
+            mSecondaryPrimaryColor = secondaryPrimaryColor;
             mAccentColor = accentColor;
         }
 
         @Override
         public void bindThumbnailTile(View view) {
-            @ColorInt int color = resolveColor(view.getResources());
-            ((ImageView) view.findViewById(R.id.option_tile)).setImageTintList(
-                    ColorStateList.valueOf(color));
-            view.setContentDescription(mLabel);
-        }
+            ImageView thumb = view.findViewById(R.id.option_primary_color_tile);
+            Resources res = view.getResources();
+            Theme theme = view.getContext().getTheme();
+            // change to 2
+            int borderWidth = 2 * res.getDimensionPixelSize(R.dimen.option_border_width);
+            int chipSize = res.getDimensionPixelSize(R.dimen.component_primary_color_chip_size);
 
-        @ColorInt
-        private int resolveColor(Resources res) {
-            return mPrimaryColor;
+            ShapeDrawable backgroundOval = new ShapeDrawable(new OvalShape());
+            backgroundOval.setIntrinsicHeight(chipSize);
+            backgroundOval.setIntrinsicWidth(chipSize);
+
+            StateListDrawable background = new StateListDrawable();
+            background.addState(new int[] {android.R.attr.state_activated},
+                    backgroundOval.getConstantState().newDrawable());
+            background.addState(new int[] {-android.R.attr.state_activated},
+                    backgroundOval.getConstantState().newDrawable());
+            background.addState(StateSet.WILD_CARD,
+                    backgroundOval.getConstantState().newDrawable());
+            background.setTintList(res.getColorStateList(R.color.option_border_color, null));
+
+            ShapeDrawable foregroundRaw =
+                    new TwoTrianglesCircleDrawable(mPrimaryColor, mSecondaryPrimaryColor);
+            foregroundRaw.setIntrinsicHeight(chipSize - borderWidth);
+            foregroundRaw.setIntrinsicWidth(chipSize - borderWidth);
+
+            StateListDrawable foreground = new StateListDrawable();
+            foreground.addState(new int[] {android.R.attr.state_activated},
+                    foregroundRaw.getConstantState().newDrawable());
+            foreground.addState(new int[] {-android.R.attr.state_activated},
+                    foregroundRaw.getConstantState().newDrawable());
+            foreground.addState(StateSet.WILD_CARD,
+                    foregroundRaw.getConstantState().newDrawable());
+
+            LayerDrawable colorChip = new LayerDrawable(new Drawable[]{background, foreground});
+            colorChip.setLayerGravity(0, Gravity.CENTER);
+            colorChip.setLayerGravity(1, Gravity.CENTER);
+
+            thumb.setImageDrawable(colorChip);
+            view.setContentDescription(mLabel);
         }
 
         @Override
@@ -475,9 +512,21 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
                         R.layout.preview_card_primary_content, cardBody, true);
             }
             Resources res = container.getResources();
-            @ColorInt int primaryColor = resolveColor(res);
             View v = container.findViewById(R.id.preview_primary);
-            v.setBackgroundColor(primaryColor);
+            int borderWidth = res.getDimensionPixelSize(R.dimen.option_border_width);
+            int cornerRadius = res.getDimensionPixelSize(R.dimen.option_border_radius);
+
+            int borderColor = res.getColor(R.color.option_border_default, null);
+            int borderColorWithAlpha = Color.argb((int) (0.24f * 255),
+                    Color.red(borderColor), Color.green(borderColor),
+                    Color.blue(borderColor));
+            ShapeDrawable background =
+                    new TwoTrianglesFramedDrawable(mPrimaryColor,
+                            mSecondaryPrimaryColor,
+                            borderColorWithAlpha,
+                            cornerRadius,
+                            borderWidth);
+            v.setBackground(background);
 
             @ColorInt int controlGreyColor = res.getColor(R.color.control_grey);
             ColorStateList tintList = new ColorStateList(
@@ -514,6 +563,7 @@ public abstract class ThemeComponentOption implements CustomizationOption<ThemeC
         @Override
         public Builder buildStep(Builder builder) {
             builder.setColorPrimary(mPrimaryColor);
+            builder.setColorSecondaryPrimary(mSecondaryPrimaryColor);
             return super.buildStep(builder);
         }
     }
