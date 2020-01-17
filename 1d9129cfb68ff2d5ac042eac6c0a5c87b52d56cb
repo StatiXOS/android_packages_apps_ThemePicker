@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "75291886_4dd47a52",
+        "filename": "src/com/android/customization/model/ResourceConstants.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2020-01-17T20:28:09Z",
+      "side": 0,
+      "message": "kektus",
+      "revId": "1d9129cfb68ff2d5ac042eac6c0a5c87b52d56cb",
+      "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "745f6d2b_ad8451ef",
+        "filename": "src/com/android/customization/model/theme/ThemeBundle.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2020-01-17T20:28:09Z",
+      "side": 0,
+      "message": "mmmm no we still want fontName",
+      "revId": "1d9129cfb68ff2d5ac042eac6c0a5c87b52d56cb",
+      "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2864494_498518c9",
+        "filename": "src/com/android/customization/model/theme/ThemeBundle.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2020-01-17T20:28:09Z",
+      "side": 0,
+      "message": "same here",
+      "revId": "1d9129cfb68ff2d5ac042eac6c0a5c87b52d56cb",
+      "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6",
+      "unresolved": true
+    }
+  ]
+}
