@@ -50,6 +50,23 @@
       "revId": "1d9129cfb68ff2d5ac042eac6c0a5c87b52d56cb",
       "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e686cfb4_6ff1e527",
+        "filename": "src/com/android/customization/model/theme/custom/ShapeOptionsProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2020-01-17T20:29:18Z",
+      "side": 0,
+      "message": "boye",
+      "revId": "1d9129cfb68ff2d5ac042eac6c0a5c87b52d56cb",
+      "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6",
+      "unresolved": true
     }
   ]
 }
