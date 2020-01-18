@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e4253fb_571b1657",
+        "filename": "src/com/android/customization/model/theme/ThemeBundle.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2020-01-18T01:07:26Z",
+      "side": 1,
+      "message": "so close kek",
+      "revId": "e58dff85cda8dd2bef41445f14141a19e926e8f6",
+      "serverId": "039621b9-0c7c-40f3-867c-684f4bc911d6",
+      "unresolved": true
+    }
+  ]
+}
