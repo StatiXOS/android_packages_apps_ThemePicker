@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.customization.picker.color.ColorSectionView
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/section_bottom_padding"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/section_horizontal_padding"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <include layout="@layout/separated_tabs" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@id/color_view_pager"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/color_options_container_top_margin"
+        android:minHeight="@dimen/color_options_container_min_height" />
+
+</com.android.customization.picker.color.ColorSectionView>
