@@ -97,7 +97,8 @@ android_app {
     platform_apis: true,
     manifest: "AndroidManifest.xml",
     additional_manifests: [":WallpaperPicker2_Manifest"],
-    overrides: ["WallpaperPicker2"],
+
+    overrides: ["WallpaperPicker2", "WallpaperPicker"],
     required: ["privapp_whitelist_com.android.wallpaper"],
 }
 
