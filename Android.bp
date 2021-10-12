@@ -106,7 +106,7 @@ android_app {
 }
 
 prebuilt_etc {
-    name: "privapp_whitelist_com.android.wallpaper",
+    name: "privapp_whitelist_com.android.wallpaper.xml",
     system_ext_specific: true,
     src: "privapp_whitelist_com.android.wallpaper.xml",
     sub_dir: "permissions",
