@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_WALLPAPER_INTERNAL"/>
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.SET_WALLPAPER_DIM_AMOUNT" />
 
     <queries>
@@ -59,6 +60,9 @@
             <category android:name="android.intent.category.HOME" />
         </intent>
     </queries>
+
+    <uses-permission android:name="com.android.launcher3.permission.READ_SETTINGS" />
+    <uses-permission android:name="com.android.launcher3.permission.WRITE_SETTINGS" />
 
     <application
         tools:replace="android:icon,android:name"
