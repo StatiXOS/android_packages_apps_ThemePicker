@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.customization.picker.iconpack.IconPackSectionView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/section_bottom_padding"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/icon_pack_title" />
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/icon_view_pager"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/icon_options_container_top_margin"
+        android:minHeight="@dimen/icon_options_container_min_height"
+        android:paddingHorizontal="@dimen/section_horizontal_padding"/>
+</com.android.customization.picker.iconpack.IconPackSectionView>
