@@ -24,7 +24,7 @@ import androidx.fragment.app.Fragment;
 import com.android.wallpaper.model.CategoryProvider;
 import com.android.wallpaper.model.WallpaperInfo;
 import com.android.wallpaper.monitor.PerformanceMonitor;
-import com.android.wallpaper.picker.ImagePreviewFragment;
+import com.android.wallpaper.picker.ImageWallpaperColorThemePreviewFragment;
 import com.android.wallpaper.picker.TopLevelPickerActivity;
 
 /**
@@ -73,7 +73,7 @@ public class WallpapersInjector extends BaseWallpaperInjector {
             int mode,
             boolean viewAsHome,
             boolean testingModeEnabled) {
-        return ImagePreviewFragment.newInstance(wallpaperInfo, mode, viewAsHome,
+        return ImageWallpaperColorThemePreviewFragment.newInstance(wallpaperInfo, mode, viewAsHome,
                 testingModeEnabled);
     }
 
