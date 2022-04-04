@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.customization.picker.color.MonetColorSectionView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/section_bottom_padding"
+    android:paddingHorizontal="@dimen/section_horizontal_padding"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/monet_color_title"
+            style="@style/SectionTitleTextStyle" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/monet_color_section_description"
+            style="@style/SectionSubtitleTextStyle"/>
+    </LinearLayout>
+
+</com.android.customization.picker.color.MonetColorSectionView>
