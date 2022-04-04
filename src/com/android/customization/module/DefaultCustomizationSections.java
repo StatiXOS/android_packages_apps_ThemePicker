@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.android.customization.model.color.MonetColorSectionController;
 import com.android.customization.model.grid.GridOptionsManager;
 import com.android.customization.model.grid.GridSectionController;
 import com.android.customization.model.iconpack.IconPackManager;
@@ -43,6 +44,9 @@ public final class DefaultCustomizationSections implements CustomizationSections
                 activity, lifecycleOwner, permissionRequester, wallpaperColorsViewModel,
                 workspaceViewModel, sectionNavigationController, wallpaperPreviewNavigator,
                 savedInstanceState));
+
+        // Monet colors
+        sectionControllers.add(new MonetColorSectionController());
 
         // Dark/Light theme section.
         sectionControllers.add(new DarkModeSectionController(activity,
