@@ -70,6 +70,7 @@ android_app {
 
     static_libs: [
         "colorkt",
+        "monet",
         "themelib",
         "wallpaper-common-deps",
         "SettingsLibSettingsTheme",
