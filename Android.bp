@@ -101,7 +101,10 @@ java_defaults {
         "librenderscript-toolkit",
     ],
 
-    required: ["android.software.theme_picker.xml"],
+    required: [
+        "android.software.theme_picker.xml",
+        "StatixColorStub",
+    ],
 
     use_embedded_native_libs: true,
 
